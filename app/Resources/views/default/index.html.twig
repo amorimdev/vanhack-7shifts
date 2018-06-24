@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <style>
+        .blue {
+            font-weight: bold;
+            color: blue;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <table id="example" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Photo</th>
+                    <th>Full name</th>
+                    <th>Email</th>
+                    <th>Hourly Wage</th>
+                    <th>Daily Regular Time</th>
+                    <th>Daily Overtime</th>
+                    <th>Daily Overtime Value ($)</th>
+                    <th>Weekly Regular Time</th>
+                    <th>Weekly Overtime</th>
+                    <th>Weekly Overtime Value ($)</th>
+                    <th>Total Worked Time</th>
+                    <th>Total Worked Value ($)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in data[0].users %}
+                    {% set dailyOvertimeValue = user.dailyOvertime * user.hourlyWage * data[0].labourSettings.dailyOvertimeMultiplier %}
+                    {% set weeklyOvertimeValue = user.weeklyOvertime * user.hourlyWage * data[0].labourSettings.dailyOvertimeMultiplier %}
+                    {% set totalWorkedTime = user.weeklyWorkedTime + user.weeklyOvertime %}
+                    {% set totalWorkedValue = dailyOvertimeValue > weeklyOvertimeValue ? dailyOvertimeValue : weeklyOvertimeValue %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td><img src="{{ user.photo }}" class="rounded float-left photo"></td>
+                        <td>{{ user.lastName ~ ', ' ~ user.firstName }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.hourlyWage | number_format(2) }}</td>
+                        <td>{{ user.dailyWorkedTime | number_format(2) }}</td>
+                        <td>{{ user.dailyOvertime | number_format(2) }}</td>
+                        <td class="{{ dailyOvertimeValue > weeklyOvertimeValue ? 'blue' }}">{{ dailyOvertimeValue | number_format(2) }}</td>
+                        <td>{{ user.weeklyWorkedTime | number_format(2) }}</td>
+                        <td>{{ user.weeklyOvertime | number_format(2) }}</td>
+                        <td class="{{ weeklyOvertimeValue > dailyOvertimeValue ? 'blue' }}">{{ weeklyOvertimeValue | number_format(2) }}</td>
+                        <td class="bold">{{ totalWorkedTime | number_format(2) }}</td>
+                        <td class="blue">{{ totalWorkedValue | number_format(2) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>Id</th>
+                    <th>Photo</th>
+                    <th>Full name</th>
+                    <th>Email</th>
+                    <th>Hourly Wage</th>
+                    <th>Daily Regular Time</th>
+                    <th>Daily Overtime</th>
+                    <th>Daily Overtime Value ($)</th>
+                    <th>Weekly Regular Time</th>
+                    <th>Weekly Overtime</th>
+                    <th>Weekly Overtime Value ($)</th>
+                    <th>Total Worked Time</th>
+                    <th>Total Worked Value ($)</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('#example').DataTable();
+        } );
+    </script>
+{% endblock %}
